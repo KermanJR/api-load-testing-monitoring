@@ -1,18 +1,28 @@
 {
-  "name": "arquitetuta-monolitica",
+  "name": "nodejs_monolith-master",
   "version": "1.0.0",
-  "description": "Api for my tests in monolithic architecture",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
   },
-  "author": "kerman",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
+  "description": "",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "mongodb": "^6.5.0",
-    "moongose": "^1.0.0",
-    "nodemon": "^3.1.0"
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.12.0",
+    "sequelize": "^6.37.3",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   }
 }
