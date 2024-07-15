@@ -16,6 +16,8 @@ const Customer = sequelize.define('Customer', {
     allowNull: false,
     unique: true,
   },
+}, {
+  tableName: 'Customers', // Especifica o nome da tabela explicitamente
 });
 
 module.exports = Customer;

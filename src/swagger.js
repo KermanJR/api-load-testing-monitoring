@@ -5,7 +5,7 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Ecommerce API',
+      title: 'Monolith Ecommerce API - TCC Load Test',
       version: '1.0.0',
       description: 'API documentation for the Ecommerce application',
     },
@@ -16,7 +16,7 @@ const options = {
       },
     ],
   },
-  apis: ['./src/routes/*.js'], // Caminho para os arquivos de rotas
+  apis: ['./src/routes/*.js'],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
