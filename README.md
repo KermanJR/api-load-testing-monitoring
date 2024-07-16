@@ -1,4 +1,4 @@
-# Projeto de Teste Carga e Monitoramento de Desempenho de API monolítica com JMeter, Prometheus e Grafana
+# Projeto de Teste de Carga e Monitoramento de Desempenho de API monolítica com JMeter, Prometheus e Grafana
 
 Este projeto visa implementar um sistema de monitoramento de desempenho para uma API com arquitetura monolítica utilizando Apache JMeter, Prometheus e Grafana. Ele permite realizar testes de carga na API, coletar métricas de desempenho e visualizar essas métricas em tempo real no Grafana.
 
