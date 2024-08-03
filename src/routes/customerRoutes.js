@@ -1,5 +1,5 @@
 const express = require('express');
-const { register, login, updateProfile, deleteUser } = require('../controllers/customerController');
+const { register, login, updateProfile, deleteUser, getAllUsers } = require('../controllers/customerController');
 const { authenticate } = require('../middlewares/auth');
 
 const router = express.Router();
@@ -29,6 +29,8 @@ const router = express.Router();
  *               password:
  *                 type: string
  *               email:
+ *                 type: string
+ *               phone:
  *                 type: string
  *     responses:
  *       201:
@@ -86,6 +88,8 @@ router.post('/login', login);
  *             type: object
  *             properties:
  *               email:
+ *                 type: string
+ *               phone:
  *                 type: string
  *     responses:
  *       200:

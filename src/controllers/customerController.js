@@ -4,10 +4,10 @@ const Customer = require('../models/customer');
 const { JWT_SECRET } = process.env;
 
 const register = async (req, res) => {
-  const { username, password, email } = req.body;
+  const { username, password, email, phone} = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const customer = await Customer.create({ username, password: hashedPassword, email });
+    const customer = await Customer.create({ username, password: hashedPassword, email, phone});
     res.status(201).json(customer);
   } catch (error) {
     res.status(500).json({ error: 'Error registering user' });

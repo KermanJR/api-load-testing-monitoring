@@ -4,54 +4,55 @@ const sequelize = require('./config/database');
 const customerRoutes = require('./routes/customerRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const prometheus = require('prom-client')
 const setupSwagger = require('./swagger');
-const client = require('prom-client');
-const Customer = require('./models/customer'); // Importa o modelo Customer
+
+const collectDefaultMetrics = prometheus.collectDefaultMetrics;
+const register = prometheus.register;
+collectDefaultMetrics({ register });
+
 
 const app = express();
 
-// Configuração de métricas Prometheus
-const collectDefaultMetrics = client.collectDefaultMetrics;
-collectDefaultMetrics();
-
-// Métricas customizadas
-const httpRequestDurationMicroseconds = new client.Histogram({
-  name: 'http_request_duration_seconds',
-  help: 'Duração das requisições HTTP em segundos',
-  labelNames: ['method', 'route', 'status_code'],
-  buckets: [0.1, 0.5, 1, 2, 5] // Durations in seconds
+const request_total_counter = new prometheus.Counter({
+  name: 'request_total',
+  help: 'Contador de Requisições',
+  labelNames: ['method', 'statusCode'],
 });
 
-const httpRequestCounter = new client.Counter({
-  name: 'http_requests_total',
-  help: 'Total de requisições HTTP recebidas',
-  labelNames: ['method', 'route', 'status_code']
+const request_time_histogram = new prometheus.Histogram({
+  name: 'aula_request_time_seconds',
+  help: 'Tempo de Resposta das Requisições',
+  buckets: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
 });
 
-const httpErrorCounter = new client.Counter({
-  name: 'http_errors_total',
-  help: 'Total de erros HTTP',
-  labelNames: ['method', 'route', 'status_code']
+const request_time_summary = new prometheus.Summary({
+  name: 'aula_summary_request_time_seconds',
+  help: 'Tempo de Resposta das Requisições',
+  percentiles: [0.01, 0.05, 0.5, 0.9, 0.95, 0.99, 0.999],
 });
 
-app.use((req, res, next) => {
-  const end = httpRequestDurationMicroseconds.startTimer();
-  res.on('finish', () => {
-    const route = req.route && req.route.path ? req.route.path : 'unknown';
-    const labels = { method: req.method, route: route, status_code: res.statusCode };
-    end(labels);
-    httpRequestCounter.inc(labels);
-    if (res.statusCode >= 400) {
-      httpErrorCounter.inc(labels);
-    }
-  });
-  next();
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+app.get('/', async function (req, res) {
+  const success = req.query.success == null || req.query.success === 'true';
+  const statusCode = success ? 200 : 500;
+  request_total_counter.labels({ method: 'GET', statusCode: statusCode }).inc(); // Incrementando em 1 um contador da quantidade de requisições desta rota na aplicação
+
+  const initialTime = Date.now();
+  await sleep(100 * Math.random());
+  const durationTime = Date.now() - initialTime;
+  request_time_histogram.observe(durationTime); // Adicionando o tempo de resposta da requisição para visualização do histograma
+  request_time_summary.observe(durationTime); // Adicionando o tempo de resposta da requisição para visualização dos percentis
+
+  res.status(statusCode).json({ success: success, data: { message: `Requisição realizada em ${durationTime} ms.` } });
 });
 
-app.get('/metrics', async (req, res) => {
-  res.set('Content-Type', client.register.contentType);
-  res.end(await client.register.metrics());
+app.get('/metrics', async function (req, res) {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
 });
+
 
 app.use(bodyParser.json());
 app.use('/api/customers', customerRoutes);
@@ -65,6 +66,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message });
 });
 
+sequelize.authenticate();
 // Sincronizar o banco de dados
 sequelize.sync({ force: true }).then(() => {
   console.log('Database connected and synchronized');
